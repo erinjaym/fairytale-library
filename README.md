@@ -1,0 +1,1 @@
+Learning how to use firestore for back end storage. Utilizing/reworking an old document that was used when I was first practicing objects in Javascript. 
