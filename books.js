@@ -1,6 +1,3 @@
-//import { firebase } from 'firebase/app';
-//import 'firebase/auth';
-//import 'firebase/database';
 class Book 
 {
     constructor(auth, name, pages, read){
@@ -13,13 +10,37 @@ class Book
         return this.title + "," + this.author + "," + this.pageCount + "," + this.beenRead;
     }
 }
-  
-let myLibrary = [] ;
-let sample = new Book ("EJM", "A Hero's Rise", 486, false);
-let selectionId = null;
-console.log(sample);
-console.log(sample.info());
-addBookToLibrary(sample);
+
+
+// start Firebase code 
+var bookConverter = {
+    toFirestore: function(book) {
+        return {
+            title: book.title,
+            author: book.author,
+            pageCount: book.pageCount,
+            beenRead: book.beenRead
+            };
+    },
+    fromFirestore: function(snapshot, options){
+        const data = snapshot.data(options);
+        return new Book(data.author, data.title, data.pageCount, data.beenRead);
+    }
+};
+
+let libRef= db.collection("books").withConverter(bookConverter);
+//let query = firebaseLibrary.where("title", "==", true);
+console.log(libRef);
+
+libRef.get().then((doc) => {
+    if (doc.exists) {
+        console.log("Document data:");
+         let storedBook = doc.data();
+         console.log(storedBook);
+    }else { console.log("Cant FIND DATA");
+    }
+}).catch((error) => { console.log('Error'); });
+
 
 function saveLibrary() {
     for (x = 0; x < myLibrary.length; x++){
@@ -38,42 +59,18 @@ function saveLibrary() {
   }
 }
 
-original book constructor now replaced with class at begining for practice per odin assignment
-function Book(auth, name, pages, read)
-{
-    this.title = name;
-    this.author = auth;
-    this.pageCount = pages;
-    this.beenRead = read;
-    this.info = function ()
-    {
-        return this.title + "," + this.author + "," + this.pageCount + "," + this.beenRead;
-    }
-    console.log("Book that was added to library: " + this.info());
 
-/* old function replaced with prototype funtion for learning experience
-    this.toggleRead =  function()
-    {
-        if(this.beenRead == false)
-        {
-           this.beenRead = true;
-        }
-        else if(this.beenRead == true)
-        {
-            this.beenRead = false;
-        }
-        else
-        {
-            console.log("brain implosion");
-        }
-    } 
-
-}  */
+// end firebase firestore main code
+let myLibrary = [] ;
+let sample = new Book ("EJM", "A Hero's Rise", 486, false);
+let selectionId = null;
+addBookToLibrary(sample);
 
 function addBookToLibrary(book) 
 {
     let bookPlacement = myLibrary.length;
     myLibrary[bookPlacement] = book;
+    saveLibrary();
 
 }
 
