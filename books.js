@@ -20,10 +20,30 @@ console.log(sample.info());
 addBookToLibrary(sample);
 
 // make a function that adds library to storage in a firebase back end. .. 
+  let firebaseConfig = {
+    apiKey: "AIzaSyBIiOEXE8C8tGQokchZR3HNIDhl8NZlVjI",
+    authDomain: "fairytale-library.firebaseapp.com",
+    projectId: "fairytale-library",
+    storageBucket: "fairytale-library.appspot.com",
+    messagingSenderId: "889453050718",
+    appId: "1:889453050718:web:ae0ab68590ed522bcaadcf"
+  };
+firebase.initializeApp(firebaseConfig);
+
+
 function saveLibrary() {
     // Add library to firebase database 
-   // return firebase.firestore().collection('messages').add({
 
+    let libraryReference = firebase.firestore.doc("books/test"); 
+    let docRef = firestore.collection("library").doc("turkey").set({
+        myLibrary
+    }).then(() => { console.log('saved shit to the cloud!'); }
+    ).catch( (error) => {
+        console.log('Errored out somehow');
+    });
+   // return firebase.firestore().collection(myLibrary).add({
+       //db is not defined error ..is db firebase>??? 
+       //now firebas is not defined .... not imported!!!  ..> need to import shit to do this. 
   }
 
 /* original book constructor now replaced with class at begining for practice per odin assignment

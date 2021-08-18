@@ -27,6 +27,7 @@
 <button id="delete" onclick="deleteSelection()">DELETE SELECTION</button>
 <button id="clear" onclick="clearDisplay();">Clear</button>
 <button id="display" onclick="displayLibrary();">Display</button>
+<button type="button" class="form-button" onclick="saveLibrary()">Add TO FIREBASE </button>
 
 
     <div id="bookentry" class="bookentry-popup">
@@ -52,25 +53,14 @@
     </div>
 
 </body>
-
-<script src="books.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+<script src="books.js"></script>
 
 <!-- TODO: Add SDKs for Firebase products that you want to use
      https://firebase.google.com/docs/web/setup#available-libraries -->
 
 <script>
-  // Your web app's Firebase configuration
-  var firebaseConfig = {
-    apiKey: "AIzaSyBIiOEXE8C8tGQokchZR3HNIDhl8NZlVjI",
-    authDomain: "fairytale-library.firebaseapp.com",
-    projectId: "fairytale-library",
-    storageBucket: "fairytale-library.appspot.com",
-    messagingSenderId: "889453050718",
-    appId: "1:889453050718:web:ae0ab68590ed522bcaadcf"
-  };
   // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
+  //firebase.initializeApp(firebaseConfig);
 </script>
 </html>
