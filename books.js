@@ -1,3 +1,6 @@
+//import { firebase } from 'firebase/app';
+//import 'firebase/auth';
+//import 'firebase/database';
 class Book 
 {
     constructor(auth, name, pages, read){
@@ -9,7 +12,6 @@ class Book
     info() {
         return this.title + "," + this.author + "," + this.pageCount + "," + this.beenRead;
     }
-
 }
   
 let myLibrary = [] ;
@@ -19,34 +21,24 @@ console.log(sample);
 console.log(sample.info());
 addBookToLibrary(sample);
 
-// make a function that adds library to storage in a firebase back end. .. 
-  let firebaseConfig = {
-    apiKey: "AIzaSyBIiOEXE8C8tGQokchZR3HNIDhl8NZlVjI",
-    authDomain: "fairytale-library.firebaseapp.com",
-    projectId: "fairytale-library",
-    storageBucket: "fairytale-library.appspot.com",
-    messagingSenderId: "889453050718",
-    appId: "1:889453050718:web:ae0ab68590ed522bcaadcf"
-  };
-firebase.initializeApp(firebaseConfig);
-
-
 function saveLibrary() {
-    // Add library to firebase database 
-
-    let libraryReference = firebase.firestore.doc("books/test"); 
-    let docRef = firestore.collection("library").doc("turkey").set({
-        myLibrary
-    }).then(() => { console.log('saved shit to the cloud!'); }
-    ).catch( (error) => {
-        console.log('Errored out somehow');
-    });
-   // return firebase.firestore().collection(myLibrary).add({
-       //db is not defined error ..is db firebase>??? 
-       //now firebas is not defined .... not imported!!!  ..> need to import shit to do this. 
+    for (x = 0; x < myLibrary.length; x++){
+        let nameValue = myLibrary[x].title;
+        let authValue = myLibrary[x].author;
+        let pageValue = myLibrary[x].pageCount;
+        let readValue = myLibrary[x].beenRead;
+        db.collection("books").doc(myLibrary[x].title).set({
+            title: nameValue,
+            author: authValue,
+            pageCount: pageValue,
+            beenRead: readValue
+    }).then(() => { console.log('saved shit to the cloud'); 
+    }).catch( (error) => { 
+        console.log ('ERROR!'); });
   }
+}
 
-/* original book constructor now replaced with class at begining for practice per odin assignment
+original book constructor now replaced with class at begining for practice per odin assignment
 function Book(auth, name, pages, read)
 {
     this.title = name;

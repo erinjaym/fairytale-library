@@ -54,13 +54,21 @@
 
 </body>
 <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-firestore.js"></script>
+<script>  
+let firebaseConfig = {
+    apiKey: "AIzaSyBIiOEXE8C8tGQokchZR3HNIDhl8NZlVjI",
+    authDomain: "fairytale-library.firebaseapp.com",
+    projectId: "fairytale-library",
+    storageBucket: "fairytale-library.appspot.com",
+    messagingSenderId: "889453050718",
+    appId: "1:889453050718:web:ae0ab68590ed522bcaadcf"
+  };
+firebase.initializeApp(firebaseConfig);
+let db = firebase.firestore();</script>
 <script src="books.js"></script>
 
 <!-- TODO: Add SDKs for Firebase products that you want to use
      https://firebase.google.com/docs/web/setup#available-libraries -->
 
-<script>
-  // Initialize Firebase
-  //firebase.initializeApp(firebaseConfig);
-</script>
 </html>
