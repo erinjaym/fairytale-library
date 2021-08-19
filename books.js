@@ -10,7 +10,11 @@ class Book
         return this.title + "," + this.author + "," + this.pageCount + "," + this.beenRead;
     }
 }
-
+let cloudLibrary = [];
+let myLibrary = [] ;
+let sample = new Book ("EJM", "A Hero's Rise", 486, false);
+let selectionId = null;
+addBookToLibrary(sample);
 
 // start Firebase code 
 var bookConverter = {
@@ -18,7 +22,7 @@ var bookConverter = {
         return {
             title: book.title,
             author: book.author,
-            pageCount: book.pageCount,
+            pageCount: book.pages,
             beenRead: book.beenRead
             };
     },
@@ -28,59 +32,56 @@ var bookConverter = {
     }
 };
 
-let libRef= db.collection("books").withConverter(bookConverter);
-//let query = firebaseLibrary.where("title", "==", true);
-console.log(libRef);
+function getBooksFromFirebase () {
+let storedLibrary = []; 
+    let libRef = db.collection("library").withConverter(bookConverter);
+    libRef.get().then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+            console.log("Document data:");
+            storedLibrary.push(doc.data());
+            //console.log(doc.id, "=>", doc.data());
+    });
+    // set local Array to stored library 
+    //need to do more than just replace array ... display methods are needed. 
+    return myLibrary = storedLibrary;
+    }).catch((error) => { console.log('Error is:', error); });
+}
 
-libRef.get().then((doc) => {
-    if (doc.exists) {
-        console.log("Document data:");
-         let storedBook = doc.data();
-         console.log(storedBook);
-    }else { console.log("Cant FIND DATA");
-    }
-}).catch((error) => { console.log('Error'); });
 
-
-function saveLibrary() {
-    for (x = 0; x < myLibrary.length; x++){
-        let nameValue = myLibrary[x].title;
-        let authValue = myLibrary[x].author;
-        let pageValue = myLibrary[x].pageCount;
-        let readValue = myLibrary[x].beenRead;
-        db.collection("books").doc(myLibrary[x].title).set({
-            title: nameValue,
+function saveBookToFirestore(titleValue, authValue, pageValue, readValue) {
+    db.collection("library").doc(titleValue).set({
+            title: titleValue,
             author: authValue,
             pageCount: pageValue,
-            beenRead: readValue
-    }).then(() => { console.log('saved shit to the cloud'); 
-    }).catch( (error) => { 
-        console.log ('ERROR!'); });
-  }
+            beenRead: readValue,
+    }).then(() => { console.log('saved data to the cloud'); 
+}).catch( (error) => { 
+    console.log ('ERROR!'); });
 }
 
 
 // end firebase firestore main code
-let myLibrary = [] ;
-let sample = new Book ("EJM", "A Hero's Rise", 486, false);
-let selectionId = null;
-addBookToLibrary(sample);
-
 function addBookToLibrary(book) 
 {
     let bookPlacement = myLibrary.length;
     myLibrary[bookPlacement] = book;
-    saveLibrary();
-
 }
 
 displayLibrary();
 function displayLibrary()
 {
+    getBooksFromFirebase();
 
     for (let bookLocation = 0; bookLocation <= myLibrary.length-1; bookLocation++) // for each book in library
-    {
-        let bookInfoArray = myLibrary[bookLocation].info().split(',');
+    {   
+                //quick rework for firestore learning experience...>  add the info to objects to stay true to old doc? 
+        let bookInfoArray = [
+            myLibrary[bookLocation].title, 
+            myLibrary[bookLocation].author, 
+            myLibrary[bookLocation].pageCount.toString(), 
+            myLibrary[bookLocation].beenRead.toString() 
+        ];
+        //let bookInfoArray = myLibrary[bookLocation].info().split(','); old code before fireStore 
         let newRow = document.getElementById("books").insertRow();
         newRow.setAttribute("id", [bookLocation]);  // sets dom ID
 
@@ -114,6 +115,7 @@ function newBook ()
   let beenRead = document.querySelector("div.bookentry-popup #yep").checked; 
   const newBook = new Book(auth, title, pages, beenRead) 
   addBookToLibrary(newBook);
+  saveBookToFirestore(title, auth, pages, beenRead);
   clearDisplay();
   displayLibrary();
 }
