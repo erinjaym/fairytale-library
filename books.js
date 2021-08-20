@@ -10,13 +10,15 @@ class Book
         return this.title + "," + this.author + "," + this.pageCount + "," + this.beenRead;
     }
 }
-let cloudLibrary = [];
-let myLibrary = [] ;
-let sample = new Book ("EJM", "A Hero's Rise", 486, false);
-let selectionId = null;
-addBookToLibrary(sample);
 
-// start Firebase code 
+let myLibrary = [] ;
+getBooksFromFirebase();
+let selectionId = null;
+let prevSelection = null;
+// let sample = new Book ("EJM", "A Hero's Rise", 486, false); < ... old code remove after firebase done
+//addBookToLibrary(sample);     < ... old code remove after firebase done
+
+// start Firebase firestore code 
 var bookConverter = {
     toFirestore: function(book) {
         return {
@@ -37,13 +39,13 @@ let storedLibrary = [];
     let libRef = db.collection("library").withConverter(bookConverter);
     libRef.get().then((querySnapshot) => {
     querySnapshot.forEach((doc) => {
-            console.log("Document data:");
             storedLibrary.push(doc.data());
-            //console.log(doc.id, "=>", doc.data());
+
     });
-    // set local Array to stored library 
-    //need to do more than just replace array ... display methods are needed. 
-    return myLibrary = storedLibrary;
+    myLibrary = storedLibrary;
+    clearDisplay();
+    displayLibrary();
+    return true;
     }).catch((error) => { console.log('Error is:', error); });
 }
 
@@ -60,17 +62,43 @@ function saveBookToFirestore(titleValue, authValue, pageValue, readValue) {
 }
 
 
-// end firebase firestore main code
-function addBookToLibrary(book) 
+function changeBookReadStatusTrue(titleValue) {
+    db.collection("library").doc(titleValue).update({
+            beenRead: "True",
+    }).then(() => { console.log('saved data to the cloud'); 
+}).catch( (error) => { 
+    console.log ('ERROR!'); });
+}
+
+function changeBookReadStatusFalse(titleValue) {
+    db.collection("library").doc(titleValue).update({
+            beenRead: "False",
+    }).then(() => { console.log('saved data to the cloud'); 
+}).catch( (error) => { 
+    console.log ('ERROR!'); });
+}
+
+//works 
+function deleteBookFromFirestore(bookId){
+    db.collection("library").doc(bookId).delete().then(() => {
+        console.log("Document successfully deleted!");
+    }).catch((error) => {
+        console.error("Error removing document: ", error);
+    });
+}
+
+
+// end firebase firestore code
+
+/* <... remove code after firestore revamp is done 
+function addBookToLibrary(book)         
 {
     let bookPlacement = myLibrary.length;
     myLibrary[bookPlacement] = book;
-}
+}*/
 
-displayLibrary();
 function displayLibrary()
 {
-    getBooksFromFirebase();
 
     for (let bookLocation = 0; bookLocation <= myLibrary.length-1; bookLocation++) // for each book in library
     {   
@@ -83,14 +111,17 @@ function displayLibrary()
         ];
         //let bookInfoArray = myLibrary[bookLocation].info().split(','); old code before fireStore 
         let newRow = document.getElementById("books").insertRow();
-        newRow.setAttribute("id", [bookLocation]);  // sets dom ID
+        
+        let bookTitleId = myLibrary[bookLocation].title.toString() // < .. test 
+
+        newRow.setAttribute("id", bookTitleId);  // sets dom ID  // need to make To book name myLibrary[bookLocation].title
 
             for (bookInfo = 0; bookInfo <= bookInfoArray.length-1; bookInfo ++ )// for each element in each book
             { 
                 newRow.insertCell().textContent = bookInfoArray[bookInfo];
 
             }
-            // add book options buttons to table
+            /*
            let readIt = document.createElement('button');
            readIt.className = "table-button";
            readIt.textContent = "Read It";
@@ -100,10 +131,9 @@ function displayLibrary()
            let remove = document.createElement('button'); 
            remove.textContent = "Delete this book";
            remove.className = "table-button";
-
-           remove.setAttribute("onclick", `deleteBook( ${newRow.id})`); 
-           newRow.insertCell().appendChild(remove);
-
+            console.log(newRow.id);
+           remove.setAttribute("onclick", `deleteBook( ${newRow.id})`);  // < ... need to adjust to book name for firebase ? 
+           newRow.insertCell().appendChild(remove); */
     }
 }
 
@@ -114,10 +144,12 @@ function newBook ()
   let pages = document.querySelector("div.bookentry-popup #pagecount").value;
   let beenRead = document.querySelector("div.bookentry-popup #yep").checked; 
   const newBook = new Book(auth, title, pages, beenRead) 
-  addBookToLibrary(newBook);
+ // addBookToLibrary(newBook); <.. part of old local library code
   saveBookToFirestore(title, auth, pages, beenRead);
   clearDisplay();
-  displayLibrary();
+  getBooksFromFirebase(); // adds book to display local library 
+  selectionId = null;      // resets selection ID in case a book was selected before clicking new book. 
+  //displayLibrary(); // < .. no longer needed has beet ut into get books form firebase 
 }
 
 function openForm() 
@@ -136,17 +168,20 @@ function clearDisplay ()
             {
                 document.getElementById("books").lastChild.remove();  
             }
-
 }
 
+
+/*  taking out old redundant code
 function deleteBook (bookId) 
 {
-    document.getElementById(bookId).remove(); //remove from page display and dom
-    myLibrary.splice(bookId, 1);        // remove from library
+    console.log(bookId);
+    //document.getElementById(bookId).remove(); //remove from page display and dom
+    //myLibrary.splice(bookId, 1);        // remove from library  <... doesnt work if we use title needs to be re written 
+   deleteBookFromFirestore(bookId); //
+    //remove from firebase 
     clearDisplay();             // clear screen 
     displayLibrary();           // reassigns correct DOM ID and ensures page is shown correctly
-     
-} 
+}  */
 
 
 function deleteSelection ()
@@ -159,8 +194,10 @@ function deleteSelection ()
     else
     {
     document.getElementById(selectionId).remove(); //remove from page display and dom
-    myLibrary.splice(selectionId, 1);        // remove from library
+    //myLibrary.splice(selectionId, 1);        // r<.... remove reference to this and just use full firestore?? 
+    deleteBookFromFirestore(selectionId);
     clearDisplay();                 // clear screen 
+    getBooksFromFirebase();
     displayLibrary();           // reassigns correct DOM ID and ensures page is shown correctly
     selectionId = null;              // reset selector ID 
     }
@@ -183,38 +220,49 @@ Book.prototype.toggleRead = function()
         }
     }
 
-
+/*  <.... remove code when Firestore revamp is done
 function changeReadStatus (bookId)
     {
-    myLibrary[bookId].toggleRead();
+   myLibrary[bookId].toggleRead(); 
     clearDisplay();
     displayLibrary();
+    }*/
+
+function readIt ()
+    {
+    document.getElementById(selectionId)
+    changeBookReadStatusTrue(selectionId);
+    //myLibrary[selectionId].toggleRead(); // <... old code remove when Firestore revamp is done
+    clearDisplay();
+    getBooksFromFirebase();
+    displayLibrary();
+    selectionId = null;      
     }
 
-function changeSelectionStatus ()
+    function havntReadIt ()
     {
-    myLibrary[selectionId].toggleRead();
+    document.getElementById(selectionId)
+    changeBookReadStatusFalse(selectionId);
+    //myLibrary[selectionId].toggleRead(); // <... <... old code remove when Firestore revamp is done
     clearDisplay();
+    getBooksFromFirebase();
     displayLibrary();
+    selectionId = null;      
     }
 
 document.getElementById("books").addEventListener('click', function (e)
 {
-
-    if (selectionId == null)
-    {
+    if (selectionId == null){
         selectionId = (e.target.parentElement.id);
         e.target.parentElement.className = "bookSelection";
-
-    }
-    else 
-    {
-        let prevSelection = selectionId;
+    }else if (selectionId === (e.target.parentElement.id) && e.target.parentElement.className == "bookSelection" ){
+            // if only selection is the same as the new selection and className is already set to selected do nothing. 
+    }else{
+        prevSelection = selectionId;
         selectionId = (e.target.parentElement.id);
         e.target.parentElement.className = "bookSelection";
-        document.getElementById(prevSelection).className = "notSelected"; // prompting error when selecting a button but functions correctly
+        document.getElementById(prevSelection).className = "notSelected"; 
     }
-
 });
 
 function checkFormValidity (){
