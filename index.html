@@ -1,74 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> <link rel="stylesheet" href="style.css">
-<title>The fairytale Library</title>
-</head>
-<body>
-    <h1 id="title"> The Fairytale Library</h1>
-<main>
-    <table id="theTable" class="booksTable">
+  <head>
+    <link rel="stylesheet" href="style.css" />
+    <title>The fairytale Library</title>
+  </head>
+  <body>
+    <h1 id="title">The Fairytale Library</h1>
+    <main>
+      <table id="theTable" class="booksTable">
         <thead>
-            <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Pagecount</th>
-                <th>Read</th>
-            </tr>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Pagecount</th>
+            <th>Read</th>
+          </tr>
         </thead>
-        <tbody id="books">
-        </tbody>
-    </table>
-</main><br><br>
+        <tbody id="books"></tbody>
+      </table>
+    </main>
+    <br /><br />
 
-<button id="addNew" onclick="openForm();">ADD BOOK</button>
-<button id="markRead" onclick="readIt()">I READ IT</button>
-<button id="markRead" onclick="havntReadIt()">I HAVN'T READ IT</button>
-<button id="delete" onclick="deleteSelection()">DELETE SELECTION</button>
-<button id="clear" onclick="clearDisplay();">Clear</button>
-<button id="display" onclick="displayLibrary();">Display</button>
-<button type="button" class="form-button" onclick="saveLibrary()">Add TO FIREBASE </button>
-<button type="button" class="form-button" onclick="getBooksFromFirebase()">Get From FIREBASE </button>
-
+    <button id="addNew" onclick="openForm();">ADD BOOK</button>
+    <button id="markRead" onclick="readIt()">I READ IT</button>
+    <button id="markRead" onclick="havntReadIt()">I HAVN'T READ IT</button>
+    <button id="delete" onclick="deleteSelection()">DELETE SELECTION</button>
 
     <div id="bookentry" class="bookentry-popup">
-        <form action="" class="formContainer">
-            <label for="author">Author Name:</label><br>
-            <input type="text" id="author" name="author" placeholder="Billy Bojangles" required><br>
+      <form action="" class="formContainer">
+        <label for="author">Author Name:</label><br />
+        <input
+          type="text"
+          id="author"
+          name="author"
+          placeholder="Billy Bojangles"
+          required
+        /><br />
 
-            <label for="booktitle">Title:</label><br>
-            <input type="text" id="booktitle" name="title" placeholder="The Bojangles Chronicles" required><br>
+        <label for="booktitle">Title:</label><br />
+        <input
+          type="text"
+          id="booktitle"
+          name="title"
+          placeholder="The Bojangles Chronicles"
+          required
+        /><br />
 
-            <label for="pagecount">Page count:</label><br>
-            <input type="text" id="pagecount" name="pagecount" placeholder="400" required><br>
+        <label for="pagecount">Page count:</label><br />
+        <input
+          type="text"
+          id="pagecount"
+          name="pagecount"
+          placeholder="400"
+          required
+        /><br />
 
-            <p>Have you read it?:</p>
-            <input type="radio" id="yep" name="read" value="yep">
-                <label for="yep" style="color: green">Yep</label>
-            <input type="radio" id="nope" name="read" value="nope">
-                <label for="nope" style="color: red">Nope</label><br><br>
+        <p>Have you read it?:</p>
+        <input type="radio" id="yep" name="read" value="yep" />
+        <label for="yep" style="color: green">Yep</label>
+        <input type="radio" id="nope" name="read" value="nope" />
+        <label for="nope" style="color: red">Nope</label><br /><br />
 
-            <button type="button" class="form-button" onclick="checkFormValidity();">Submit</button>
-            <button type="button" class="form-button" onclick="closeForm()">Nevermind</button>
-        </form>
+        <button
+          type="button"
+          class="form-button"
+          onclick="checkFormValidity();"
+        >
+          Submit
+        </button>
+        <button type="button" class="form-button" onclick="closeForm()">
+          Nevermind
+        </button>
+      </form>
     </div>
+  </body>
+  <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-firestore.js"></script>
+  <script>
+    let firebaseConfig = {
+      apiKey: "AIzaSyBIiOEXE8C8tGQokchZR3HNIDhl8NZlVjI",
+      authDomain: "fairytale-library.firebaseapp.com",
+      projectId: "fairytale-library",
+      storageBucket: "fairytale-library.appspot.com",
+      messagingSenderId: "889453050718",
+      appId: "1:889453050718:web:ae0ab68590ed522bcaadcf",
+    };
+    firebase.initializeApp(firebaseConfig);
+    let db = firebase.firestore();
+  </script>
+  <script src="books.js"></script>
 
-</body>
-<script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-firestore.js"></script>
-<script>  
-let firebaseConfig = {
-    apiKey: "AIzaSyBIiOEXE8C8tGQokchZR3HNIDhl8NZlVjI",
-    authDomain: "fairytale-library.firebaseapp.com",
-    projectId: "fairytale-library",
-    storageBucket: "fairytale-library.appspot.com",
-    messagingSenderId: "889453050718",
-    appId: "1:889453050718:web:ae0ab68590ed522bcaadcf"
-  };
-firebase.initializeApp(firebaseConfig);
-let db = firebase.firestore();</script>
-<script src="books.js"></script>
-
-<!-- TODO: Add SDKs for Firebase products that you want to use
+  <!-- TODO: Add SDKs for Firebase products that you want to use
      https://firebase.google.com/docs/web/setup#available-libraries -->
-
 </html>
